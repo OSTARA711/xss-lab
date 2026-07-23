@@ -27,7 +27,9 @@ This repository is a small, self-contained page with a few classic vulnerable pa
 Visit the deployed page and append a payload like:
 
 https://xss-lab.pages.dev/?q=<img src=x onerror=alert(1)>
+
 https://xss-lab.pages.dev/?name=<script>alert(2)</script>
+
 https://xss-lab.pages.dev/#<img src=x onerror=alert(3)>
 
 Or scan with [Dalfox](https://dalfox.hahwul.com/)
@@ -44,5 +46,3 @@ directly from this repository.
 ## License
 
 MIT License, please check [LICENSE](./LICENSE)
-
-MIT — see [LICENSE](./LICENSE).
