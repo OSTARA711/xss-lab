@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DOM XSS Test Lab — Intentionally Vulnerable</title>
+  <title>DOM XSS Test Lab</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
     section { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
@@ -18,7 +18,7 @@
 </head>
 <body>
   <h1>DOM XSS Test Lab</h1>
-  <p>Intentionally vulnerable static page for testing scanners like Dalfox. Do not deploy this to a domain that looks like a real product — keep it clearly labeled as a test lab.</p>
+  <p>Static webpage designed to test XSS scanners like Dalfox</p>
 
   <section class="vuln">
     <h2>1. Query string → <code>innerHTML</code> <span class="badge vuln">Vulnerable</span></h2>
@@ -47,6 +47,16 @@
     <div id="output-safe" class="output"></div>
     <p>Try the same payload: <code>?safe=&lt;img src=x onerror=alert(4)&gt;</code> — it will show up as plain text, not run.</p>
   </section>
+
+  <footer style="margin-top:40px; padding-top:16px; border-top:1px solid #ddd; font-size:0.85em; color:#666;">
+    <p>
+      This static webpage collects no personal data and sets no cookies — all logic
+      runs client-side in your browser only.
+    </p>
+    <p>
+      OSTARA.WORK <a href="https://www.ostara.work/legal">Terms & Conditions</a>
+    </p>
+  </footer>
 
   <script>
     // --- 1. VULNERABLE: query param into innerHTML ---
