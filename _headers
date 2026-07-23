@@ -1,0 +1,30 @@
+# xss-lab.pages.dev — headers file
+# Intentionally NO restrictive Content-Security-Policy here: script-src 'self'
+# would block the inline onerror/document.write payloads this lab exists to
+# demonstrate. Every header below is either neutral to XSS execution, or
+# deliberately weak/misconfigured as a teaching example of common mistakes.
+
+/*
+  # Keep this lab out of search engine indexes (unlike a real product site)
+  X-Robots-Tag: noindex, nofollow
+
+  # BAD: wildcard CORS — allows any origin to read responses from this site
+  Access-Control-Allow-Origin: *
+
+  # BAD: CSP present but neutered with 'unsafe-inline', a very common
+  # real-world misconfiguration that looks protective but does nothing
+  # to stop inline script/event-handler XSS
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';
+
+  # BAD: no X-Frame-Options set at all — site can be framed by anyone,
+  # leaving it open to clickjacking (intentionally omitted, not just weak)
+
+  # BAD: no Strict-Transport-Security — HTTPS not enforced at the
+  # browser level even though Cloudflare Pages serves over TLS
+
+  # BAD: permissive Permissions-Policy, explicitly allowing sensitive
+  # features rather than denying them
+  Permissions-Policy: geolocation=*, microphone=*, camera=*
+
+  # BAD: verbose referrer leakage
+  Referrer-Policy: unsafe-url
