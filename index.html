@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DOM XSS Test Lab — Intentionally Vulnerable</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+    section { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    h2 { margin-top: 0; font-size: 1.1em; }
+    .vuln { border-color: #e33; }
+    .safe { border-color: #2a2; }
+    code { background: #f4f4f4; padding: 2px 5px; border-radius: 4px; }
+    .output { margin-top: 10px; padding: 10px; background: #fafafa; border-radius: 4px; min-height: 1.2em; }
+    .badge { font-size: 0.75em; padding: 2px 8px; border-radius: 10px; color: #fff; }
+    .badge.vuln { background: #e33; }
+    .badge.safe { background: #2a2; }
+  </style>
+</head>
+<body>
+  <h1>DOM XSS Test Lab</h1>
+  <p>Intentionally vulnerable static page for testing scanners like Dalfox. Do not deploy this to a domain that looks like a real product — keep it clearly labeled as a test lab.</p>
+
+  <section class="vuln">
+    <h2>1. Query string → <code>innerHTML</code> <span class="badge vuln">Vulnerable</span></h2>
+    <p>Reads <code>?q=</code> and writes it into the DOM unescaped.</p>
+    <div id="output-query" class="output"></div>
+    <p>Try: <code>?q=&lt;img src=x onerror=alert(1)&gt;</code></p>
+  </section>
+
+  <section class="vuln">
+    <h2>2. URL fragment (hash) → <code>innerHTML</code> <span class="badge vuln">Vulnerable</span></h2>
+    <p>Reads <code>#</code> fragment and writes it into the DOM unescaped. Fragment values never reach the server at all, so this is a purely client-side (DOM-based) vector — a server-side scanner or WAF logs won't see the payload.</p>
+    <div id="output-hash" class="output"></div>
+    <p>Try: <code>#&lt;img src=x onerror=alert(2)&gt;</code> (reload after editing the hash, since <code>hashchange</code> is also wired up below)</p>
+  </section>
+
+  <section class="vuln">
+    <h2>3. Query string → <code>document.write</code> <span class="badge vuln">Vulnerable</span></h2>
+    <p>Reads <code>?name=</code> and writes it via <code>document.write</code>, another classic sink.</p>
+    <div id="output-write" class="output"></div>
+    <p>Try: <code>?name=&lt;script&gt;alert(3)&lt;/script&gt;</code></p>
+  </section>
+
+  <section class="safe">
+    <h2>4. Query string → safe text rendering <span class="badge safe">Safe</span></h2>
+    <p>Reads <code>?safe=</code> but uses <code>textContent</code> instead of <code>innerHTML</code>, so any HTML/script in the input is displayed as literal text, not executed.</p>
+    <div id="output-safe" class="output"></div>
+    <p>Try the same payload: <code>?safe=&lt;img src=x onerror=alert(4)&gt;</code> — it will show up as plain text, not run.</p>
+  </section>
+
+  <script>
+    // --- 1. VULNERABLE: query param into innerHTML ---
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q') || '(nothing — add ?q=... to the URL)';
+      document.getElementById('output-query').innerHTML = "You searched for: " + q;
+    })();
+
+    // --- 2. VULNERABLE: location.hash into innerHTML ---
+    function renderHash() {
+      const hash = decodeURIComponent(window.location.hash.slice(1)) || '(nothing — add #... to the URL)';
+      document.getElementById('output-hash').innerHTML = "Hash says: " + hash;
+    }
+    renderHash();
+    window.addEventListener('hashchange', renderHash);
+
+    // --- 3. VULNERABLE: query param into document.write ---
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name');
+      if (name) {
+        document.getElementById('output-write').innerHTML = ''; // clear placeholder
+        document.write("Hello, " + name + "!");
+      } else {
+        document.getElementById('output-write').textContent = '(nothing — add ?name=... to the URL)';
+      }
+    })();
+
+    // --- 4. SAFE: query param into textContent ---
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const safe = params.get('safe') || '(nothing — add ?safe=... to the URL)';
+      document.getElementById('output-safe').textContent = "You entered: " + safe;
+    })();
+  </script>
+</body>
+</html>
