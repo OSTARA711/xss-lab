@@ -1,0 +1,20 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Node (in case you add tooling later, e.g. a linter or bundler)
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Cloudflare Pages local dev
+.wrangler/
+wrangler.toml.bak
+
+# Logs
+*.log
