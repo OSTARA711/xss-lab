@@ -26,11 +26,15 @@ This repository is a small, self-contained page with a few classic vulnerable pa
 
 Visit the deployed page and append a payload like:
 
+```bash
 https://xss-lab.pages.dev/?q=<img src=x onerror=alert(1)>
 
 https://xss-lab.pages.dev/?name=<script>alert(2)</script>
 
 https://xss-lab.pages.dev/#<img src=x onerror=alert(3)>
+```
+
+## Dalfox
 
 Or scan with [Dalfox](https://dalfox.hahwul.com/)
 
